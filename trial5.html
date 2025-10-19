@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO Deep Space Detection Station</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        
+        :root {
+            --primary-color: #00d4ff;
+            --primary-dark: #0099cc;
+            --primary-light: #66e6ff;
+            --secondary-color: #ff6b35;
+            --accent-cyan: #00ffff;
+            --accent-orange: #ff8533;
+            --background-color: #0a0e1a;
+            --surface-color: #1a1f2e;
+            --surface-light: #242937;
+            --text-color: #e8f4fd;
+            --text-muted: #8fb3d3;
+            --border-color: #334155;
+            --success-color: #00ff88;
+            --error-color: #ff4757;
+            --warning-color: #ffa726;
+            --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #006699 100%);
+            --space-gradient: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 50%, #242937 100%);
+            --nebula-gradient: radial-gradient(circle at center, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.05) 40%, transparent 70%);
+            --card-shadow: 0 25px 50px -12px rgba(0, 212, 255, 0.15);
+            --card-shadow-hover: 0 35px 60px -12px rgba(0, 212, 255, 0.25);
+            --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3);
+            --glow-orange: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Space Station Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                var(--space-gradient),
+                radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 60% 70%, rgba(0, 255, 255, 0.04) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 49%, rgba(0, 212, 255, 0.02) 50%, transparent 51%),
+                linear-gradient(-45deg, transparent 49%, rgba(0, 212, 255, 0.02) 50%, transparent 51%);
+            background-size: 100% 100%, 400px 400px, 600px 600px, 800px 800px, 100px 100px, 100px 100px;
+            z-index: -2;
+        }
+
+        /* Animated stars */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(0, 212, 255, 0.4), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.2), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(0, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.25), transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Header Styles */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header-icon {
+            font-size: 4rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: block;
+            filter: drop-shadow(var(--glow-cyan));
+            animation: pulse-glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.3)); }
+            100% { filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.6)); }
+        }
+
+        header h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            position: relative;
+        }
+
+        header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            box-shadow: var(--glow-cyan);
+        }
+
+        header p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 400;
+            position: relative;
+        }
+
+        header p::before {
+            content: '◦ ';
+            color: var(--accent-cyan);
+        }
+
+        header p::after {
+            content: ' ◦';
+            color: var(--accent-cyan);
+        }
+
+        /* Upload Section */
+        .upload-container {
+            background: var(--surface-color);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-gradient);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .upload-container::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: var(--glow-cyan);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .file-drop-zone {
+            width: 100%;
+            max-width: 500px;
+            border: 2px dashed rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0, 212, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .file-drop-zone:hover::before {
+            left: 100%;
+        }
+
+        .file-drop-zone:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.05);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .file-drop-zone.dragover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+            transform: scale(1.02);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            display: block;
+            filter: drop-shadow(var(--glow-cyan));
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        #detect-btn {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--glow-cyan);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        #detect-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        #detect-btn:hover::before {
+            left: 100%;
+        }
+
+        #detect-btn:disabled {
+            background: var(--surface-light);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #detect-btn:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .clear-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .clear-btn:hover {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-orange);
+        }
+
+        /* File List */
+        .file-list-container {
+            background: var(--surface-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .file-list-container::before {
+            content: 'MISSION QUEUE';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--surface-color);
+            color: var(--accent-cyan);
+            padding: 0 10px;
+            font-size: 0.7rem;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .file-list-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        #file-list {
+            list-style: none;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .file-item {
+            background: var(--surface-light);
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .file-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent-cyan);
+            border-radius: 0 3px 3px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .file-item:hover {
+            background: rgba(0, 212, 255, 0.05);
+            border-color: var(--accent-cyan);
+            transform: translateX(5px);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .file-item:hover::before {
+            opacity: 1;
+        }
+
+        .file-icon {
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .file-size {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: 'Orbitron', monospace;
+        }
+
+        .file-remove {
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .file-remove:hover {
+            background: rgba(255, 107, 53, 0.1);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* Status Area */
+        #status-area {
+            background: var(--surface-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        #status-area::before {
+            content: 'SYSTEM STATUS';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--surface-color);
+            color: var(--accent-cyan);
+            padding: 0 10px;
+            font-size: 0.7rem;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        #status-area.status-hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent-cyan);
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            box-shadow: var(--glow-cyan);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #status-text {
+            font-weight: 500;
+            font-size: 1rem;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        #status-text.error { color: var(--error-color); }
+        #status-text.success { color: var(--success-color); }
+        #status-text.warning { color: var(--warning-color); }
+
+        /* Results Grid */
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-gradient);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .result-card::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 6px;
+            height: 6px;
+            background: var(--success-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success-color);
+            animation: blink 2s infinite;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--accent-cyan);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .result-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .detection-summary {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .detection-count {
+            background: var(--accent-cyan);
+            color: var(--background-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .expand-icon {
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .image-container {
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .result-card canvas {
+            width: 100%;
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Detection Details */
+        .detection-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .detection-details.expanded {
+            max-height: 500px;
+        }
+
+        .detection-list {
+            background: var(--surface-light);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            position: relative;
+        }
+
+        .detection-list::before {
+            content: 'SCAN RESULTS';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--surface-light);
+            color: var(--accent-cyan);
+            padding: 0 8px;
+            font-size: 0.6rem;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .detection-list h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .detection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: var(--surface-color);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .detection-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-cyan);
+            border-radius: 0 2px 2px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .detection-item:hover {
+            background: rgba(0, 212, 255, 0.05);
+            border-color: var(--accent-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .detection-item:hover::before {
+            opacity: 1;
+        }
+
+        .detection-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detection-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detection-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .detection-name {
+            font-weight: 500;
+            color: var(--text-color);
+            text-transform: capitalize;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .detection-confidence {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .confidence-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--surface-light);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error-color), var(--warning-color), var(--success-color));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .confidence-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 45px;
+            text-align: right;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .high-confidence { color: var(--success-color); }
+        .medium-confidence { color: var(--warning-color); }
+        .low-confidence { color: var(--error-color); }
+
+        /* Empty state */
+        .no-detections {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            background: var(--surface-light);
+            border-radius: 12px;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .no-detections i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: var(--secondary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .upload-container {
+                padding: 2rem;
+                border-radius: 16px;
+            }
+
+            .file-drop-zone {
+                padding: 2rem 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            #detect-btn, .clear-btn {
+                width: 100%;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .detection-summary {
+                align-self: flex-end;
+            }
+
+            header h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .upload-container {
+                padding: 1.5rem;
+            }
+
+            .file-drop-zone {
+                padding: 1.5rem 1rem;
+            }
+
+            .upload-icon {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Animation for results appearing */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Additional space station elements */
+        .system-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .indicator-light {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        .indicator-light.green {
+            background: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+
+        .indicator-light.cyan {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation-delay: 0.5s;
+        }
+
+        .indicator-light.orange {
+            background: var(--secondary-color);
+            box-shadow: 0 0 10px var(--secondary-color);
+            animation-delay: 1s;
+        }
+    </style>
+</head>
+<body>
+    <!-- System Indicators -->
+    <div class="system-indicator">
+        <div class="indicator-light green"></div>
+        <div class="indicator-light cyan"></div>
+        <div class="indicator-light orange"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <i class="fas fa-satellite-dish header-icon"></i>
+            <h1>YOLO Deep Space Detection Station</h1>
+            <p>Advanced AI-powered object detection with state-of-the-art YOLOv8 technology</p>
+        </header>
+
+        <main>
+            <div class="upload-container">
+                <div class="upload-section">
+                    <label for="file-input" class="file-drop-zone" id="drop-zone">
+                        <i class="fas fa-satellite upload-icon"></i>
+                        <div class="upload-text">Add Images to Mission Queue</div>
+                        <div class="upload-subtext">Compatible formats: PNG, JPEG, JPG • Images will accumulate until reset</div>
+                    </label>
+                    <input id="file-input" type="file" accept="image/png, image/jpeg, image/jpg" multiple>
+                    
+                    <div class="controls">
+                        <button id="detect-btn" disabled>
+                            <i class="fas fa-radar"></i>
+                            Begin Deep Scan
+                        </button>
+                        <button id="clear-btn" class="clear-btn">
+                            <i class="fas fa-power-off"></i>
+                            System Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="file-list-container" class="file-list-container" style="display: none;">
+                <div class="file-list-header">
+                    <i class="fas fa-database"></i>
+                    <span>Mission Queue</span>
+                    <span id="file-count" style="color: var(--text-muted); font-weight: 400;"></span>
+                </div>
+                <ul id="file-list"></ul>
+            </div>
+
+            <div id="status-area" class="status-hidden">
+                <div id="spinner" class="spinner"></div>
+                <p id="status-text"></p>
+            </div>
+
+            <div id="results-section" style="display: none;">
+                <div class="results-header">
+                    <i class="fas fa-chart-network"></i>
+                    <span>Scan Analysis Results</span>
+                </div>
+                <div id="results-container" class="results-grid"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('file-input');
+            const detectBtn = document.getElementById('detect-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const fileList = document.getElementById('file-list');
+            const fileListContainer = document.getElementById('file-list-container');
+            const fileCount = document.getElementById('file-count');
+            const statusArea = document.getElementById('status-area');
+            const spinner = document.getElementById('spinner');
+            const statusText = document.getElementById('status-text');
+            const resultsContainer = document.getElementById('results-container');
+            const resultsSection = document.getElementById('results-section');
+            const dropZone = document.getElementById('drop-zone');
+
+            const apiUrl = 'https://yolo-rawat-b3b26999.eastus.azurecontainer.io/detect';
+            let missionQueue = []; // Array to store accumulated files
+            let processedResults = new Set(); // Track processed files to avoid duplicates in results
+
+            // Event listeners
+            fileInput.addEventListener('change', handleFileSelect);
+            detectBtn.addEventListener('click', handleDetect);
+            clearBtn.addEventListener('click', clearFiles);
+
+            // Drag and drop functionality
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+            dropZone.addEventListener('drop', handleDrop);
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }
+
+            function handleDragLeave(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFileSelect({ target: { files } });
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 BYTES';
+                const k = 1024;
+                const sizes = ['BYTES', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function generateFileId(file) {
+                return `${file.name}_${file.size}_${file.lastModified}`;
+            }
+
+            function handleFileSelect(event) {
+                const newFiles = Array.from(event.target.files);
+                
+                // Add new files to the mission queue, avoiding duplicates
+                newFiles.forEach(file => {
+                    const fileId = generateFileId(file);
+                    const exists = missionQueue.some(f => generateFileId(f) === fileId);
+                    if (!exists) {
+                        missionQueue.push(file);
+                    }
+                });
+
+                // Clear the file input to allow selecting the same files again
+                fileInput.value = '';
+                
+                updateFileList();
+                updateButtons();
+            }
+
+            function removeFile(index) {
+                missionQueue.splice(index, 1);
+                updateFileList();
+                updateButtons();
+            }
+
+            function updateFileList() {
+                fileList.innerHTML = '';
+
+                if (missionQueue.length > 0) {
+                    fileListContainer.style.display = 'block';
+                    fileCount.textContent = `(${missionQueue.length} ${missionQueue.length === 1 ? 'TARGET' : 'TARGETS'})`;
+                    
+                    missionQueue.forEach((file, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'file-item';
+                        listItem.innerHTML = `
+                            <i class="fas fa-image file-icon"></i>
+                            <div class="file-info">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-size">${formatFileSize(file.size)}</div>
+                            </div>
+                            <i class="fas fa-times file-remove" data-index="${index}" title="Remove from queue"></i>
+                        `;
+                        
+                        // Add remove functionality
+                        const removeBtn = listItem.querySelector('.file-remove');
+                        removeBtn.addEventListener('click', () => removeFile(index));
+                        
+                        fileList.appendChild(listItem);
+                    });
+                } else {
+                    fileListContainer.style.display = 'none';
+                }
+            }
+
+            function updateButtons() {
+                detectBtn.disabled = missionQueue.length === 0;
+            }
+
+            function clearFiles() {
+                missionQueue = [];
+                processedResults.clear();
+                fileInput.value = '';
+                fileList.innerHTML = '';
+                fileListContainer.style.display = 'none';
+                resultsContainer.innerHTML = '';
+                resultsSection.style.display = 'none';
+                detectBtn.disabled = true;
+                hideStatus();
+                updateStatus('SYSTEM RESET - All mission data cleared', 'warning');
+                setTimeout(() => hideStatus(), 2000);
+            }
+
+            async function handleDetect() {
+                if (missionQueue.length === 0) {
+                    updateStatus('ERROR: No targets in mission queue', 'error');
+                    return;
+                }
+
+                // Filter out files that have already been processed
+                const unprocessedFiles = missionQueue.filter(file => {
+                    const fileId = generateFileId(file);
+                    return !processedResults.has(fileId);
+                });
+
+                if (unprocessedFiles.length === 0) {
+                    updateStatus('INFO: All targets already analyzed', 'warning');
+                    return;
+                }
+
+                const formData = new FormData();
+                unprocessedFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                showLoading(true, `SCANNING ${unprocessedFiles.length} NEW TARGET${unprocessedFiles.length > 1 ? 'S' : ''}...`);
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.text();
+                        throw new Error(`SYSTEM ERROR: ${response.status} - ${errorData}`);
+                    }
+
+                    const responseData = await response.json();
+                    console.log('API Response:', responseData);
+                    
+                    let results;
+                    
+                    if (Array.isArray(responseData)) {
+                        results = responseData;
+                    } else if (responseData.results && Array.isArray(responseData.results)) {
+                        results = responseData.results;
+                    } else if (responseData.detections) {
+                        results = [{
+                            filename: unprocessedFiles[0]?.name || 'unknown',
+                            detections: responseData.detections
+                        }];
+                    } else {
+                        throw new Error(`PROTOCOL ERROR: Unexpected data format received`);
+                    }
+                    
+                    updateStatus(`✦ SCAN COMPLETE - ${unprocessedFiles.length} new target${unprocessedFiles.length > 1 ? 's' : ''} analyzed`, 'success');
+                    
+                    // Show results section if not already visible
+                    if (resultsSection.style.display === 'none') {
+                        resultsSection.style.display = 'block';
+                    }
+                    
+                    // Process results and mark files as processed
+                    for (let i = 0; i < results.length; i++) {
+                        const resultData = results[i];
+                        const originalFile = unprocessedFiles.find(f => f.name === resultData.filename);
+                        if (originalFile) {
+                            const fileId = generateFileId(originalFile);
+                            processedResults.add(fileId);
+                            await displayDetectionResult(originalFile, resultData.detections);
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Error calling API:', error);
+                    updateStatus(`⚠ ${error.message}`, 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            function getConfidenceClass(confidence) {
+                if (confidence >= 0.8) return 'high-confidence';
+                if (confidence >= 0.5) return 'medium-confidence';
+                return 'low-confidence';
+            }
+
+            function displayDetectionResult(imageFile, detections) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const card = document.createElement('div');
+                            card.className = 'result-card';
+
+                            // Create header with toggle functionality
+                            const header = document.createElement('div');
+                            header.className = 'result-header';
+                            
+                            const title = document.createElement('h2');
+                            title.innerHTML = `<i class="fas fa-crosshairs"></i>${imageFile.name}`;
+                            
+                            const summary = document.createElement('div');
+                            summary.className = 'detection-summary';
+                            
+                            const detectionCount = document.createElement('span');
+                            detectionCount.className = 'detection-count';
+                            detectionCount.textContent = `${detections?.length || 0} OBJECTS`;
+                            
+                            const expandIcon = document.createElement('i');
+                            expandIcon.className = 'fas fa-chevron-down expand-icon';
+                            
+                            summary.appendChild(detectionCount);
+                            summary.appendChild(expandIcon);
+                            
+                            header.appendChild(title);
+                            header.appendChild(summary);
+                            
+                            // Create image container
+                            const imageContainer = document.createElement('div');
+                            imageContainer.className = 'image-container';
+                            
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+
+                            if (detections && detections.length > 0) {
+                                detections.forEach(detection => {
+                                    const { class_name, confidence, bounding_box } = detection;
+                                    const [x1, y1, x2, y2] = bounding_box.map(coord => parseInt(coord, 10));
+
+                                    // Draw bounding box with space station style
+                                    ctx.strokeStyle = '#00d4ff';
+                                    ctx.lineWidth = 3;
+                                    ctx.setLineDash([]);
+                                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+                                    // Add corner indicators
+                                    const cornerSize = 12;
+                                    ctx.strokeStyle = '#00ffff';
+                                    ctx.lineWidth = 2;
+                                    
+                                    // Top-left corner
+                                    ctx.beginPath();
+                                    ctx.moveTo(x1, y1 + cornerSize);
+                                    ctx.lineTo(x1, y1);
+                                    ctx.lineTo(x1 + cornerSize, y1);
+                                    ctx.stroke();
+                                    
+                                    // Top-right corner
+                                    ctx.beginPath();
+                                    ctx.moveTo(x2 - cornerSize, y1);
+                                    ctx.lineTo(x2, y1);
+                                    ctx.lineTo(x2, y1 + cornerSize);
+                                    ctx.stroke();
+                                    
+                                    // Bottom-left corner
+                                    ctx.beginPath();
+                                    ctx.moveTo(x1, y2 - cornerSize);
+                                    ctx.lineTo(x1, y2);
+                                    ctx.lineTo(x1 + cornerSize, y2);
+                                    ctx.stroke();
+                                    
+                                    // Bottom-right corner
+                                    ctx.beginPath();
+                                    ctx.moveTo(x2 - cornerSize, y2);
+                                    ctx.lineTo(x2, y2);
+                                    ctx.lineTo(x2, y2 - cornerSize);
+                                    ctx.stroke();
+
+                                    // Prepare label with percentage
+                                    const percentage = (confidence * 100).toFixed(1);
+                                    const label = `${class_name.toUpperCase()}: ${percentage}%`;
+                                    
+                                    // Set font properties
+                                    const fontSize = Math.max(12, Math.min(16, canvas.width / 50));
+                                    ctx.font = `600 ${fontSize}px Orbitron`;
+                                    ctx.textAlign = 'left';
+                                    ctx.textBaseline = 'top';
+                                    
+                                    // Measure text dimensions
+                                    const textMetrics = ctx.measureText(label);
+                                    const textWidth = textMetrics.width;
+                                    const textHeight = fontSize;
+                                    const padding = 8;
+                                    
+                                    // Calculate label position
+                                    let labelX = x1;
+                                    let labelY = y1 - textHeight - padding * 2;
+                                    
+                                    if (labelY < 0) {
+                                        labelY = y1 + padding;
+                                    }
+                                    
+                                    if (labelX + textWidth + padding * 2 > canvas.width) {
+                                        labelX = Math.max(0, x2 - textWidth - padding * 2);
+                                    }
+                                    
+                                    if (labelX < 0) {
+                                        labelX = padding;
+                                    }
+                                    
+                                    // Draw space station style label background
+                                    const rectX = labelX - padding;
+                                    const rectY = labelY - padding;
+                                    const rectWidth = textWidth + padding * 2;
+                                    const rectHeight = textHeight + padding * 2;
+                                    
+                                    // Gradient background
+                                    const gradient = ctx.createLinearGradient(rectX, rectY, rectX + rectWidth, rectY + rectHeight);
+                                    gradient.addColorStop(0, 'rgba(0, 212, 255, 0.95)');
+                                    gradient.addColorStop(0.5, 'rgba(0, 153, 204, 0.95)');
+                                    gradient.addColorStop(1, 'rgba(0, 102, 153, 0.95)');
+                                    
+                                    ctx.fillStyle = gradient;
+                                    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+                                    
+                                    // Draw border with glow effect
+                                    ctx.strokeStyle = '#00ffff';
+                                    ctx.lineWidth = 1;
+                                    ctx.shadowColor = '#00ffff';
+                                    ctx.shadowBlur = 5;
+                                    ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+                                    ctx.shadowBlur = 0;
+                                    
+                                    // Draw the text
+                                    ctx.fillStyle = '#ffffff';
+                                    ctx.fillText(label, labelX, labelY);
+                                    
+                                    // Reset for next detection
+                                    ctx.lineWidth = 3;
+                                });
+                            }
+                            
+                            imageContainer.appendChild(canvas);
+                            
+                            // Create detection details section
+                            const detailsSection = document.createElement('div');
+                            detailsSection.className = 'detection-details';
+                            
+                            if (detections && detections.length > 0) {
+                                const detectionList = document.createElement('div');
+                                detectionList.className = 'detection-list';
+                                
+                                const listTitle = document.createElement('h3');
+                                listTitle.innerHTML = '<i class="fas fa-list-check"></i>Detected Objects';
+                                detectionList.appendChild(listTitle);
+                                
+                                detections.forEach((detection, index) => {
+                                    const { class_name, confidence } = detection;
+                                    const percentage = (confidence * 100).toFixed(1);
+                                    
+                                    const item = document.createElement('div');
+                                    item.className = 'detection-item';
+                                    
+                                    const info = document.createElement('div');
+                                    info.className = 'detection-info';
+                                    
+                                    const icon = document.createElement('div');
+                                    icon.className = 'detection-icon';
+                                    
+                                    const name = document.createElement('span');
+                                    name.className = 'detection-name';
+                                    name.textContent = class_name.toUpperCase();
+                                    
+                                    info.appendChild(icon);
+                                    info.appendChild(name);
+                                    
+                                    const confidenceContainer = document.createElement('div');
+                                    confidenceContainer.className = 'detection-confidence';
+                                    
+                                    const confidenceBar = document.createElement('div');
+                                    confidenceBar.className = 'confidence-bar';
+                                    
+                                    const confidenceFill = document.createElement('div');
+                                    confidenceFill.className = 'confidence-fill';
+                                    confidenceFill.style.width = `${confidence * 100}%`;
+                                    
+                                    confidenceBar.appendChild(confidenceFill);
+                                    
+                                    const confidenceText = document.createElement('span');
+                                    confidenceText.className = `confidence-text ${getConfidenceClass(confidence)}`;
+                                    confidenceText.textContent = `${percentage}%`;
+                                    
+                                    confidenceContainer.appendChild(confidenceBar);
+                                    confidenceContainer.appendChild(confidenceText);
+                                    
+                                    item.appendChild(info);
+                                    item.appendChild(confidenceContainer);
+                                    
+                                    detectionList.appendChild(item);
+                                });
+                                
+                                detailsSection.appendChild(detectionList);
+                            } else {
+                                const noDetections = document.createElement('div');
+                                noDetections.className = 'no-detections';
+                                noDetections.innerHTML = `
+                                    <i class="fas fa-satellite-dish"></i>
+                                    <div>NO OBJECTS DETECTED IN SCAN RANGE</div>
+                                `;
+                                detailsSection.appendChild(noDetections);
+                            }
+                            
+                            // Add toggle functionality
+                            header.addEventListener('click', () => {
+                                detailsSection.classList.toggle('expanded');
+                                expandIcon.classList.toggle('expanded');
+                            });
+                            
+                            card.appendChild(header);
+                            card.appendChild(imageContainer);
+                            card.appendChild(detailsSection);
+                            resultsContainer.appendChild(card);
+                            resolve();
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(imageFile);
+                });
+            }
+
+            function updateStatus(message, type = 'info') {
+                statusText.textContent = message;
+                statusText.className = type;
+            }
+
+            function showLoading(isLoading, message = '') {
+                if (isLoading) {
+                    statusArea.classList.remove('status-hidden');
+                    spinner.style.display = 'block';
+                    updateStatus(message);
+                } else {
+                    spinner.style.display = 'none';
+                }
+            }
+
+            function hideStatus() {
+                setTimeout(() => {
+                    statusArea.classList.add('status-hidden');
+                }, 2000);
+            }
+
+            // Initialize
+            updateButtons();
+        });
+    </script>
+</body>
+</html>
