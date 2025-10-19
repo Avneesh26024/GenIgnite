@@ -1,5 +1,14 @@
 # 🧠 Improving YOLO Object Detection via Targeted Copy-Paste Augmentation
 
+---
+
+## 🌐 Live Demo
+
+You can view our deployed YOLO model here:  
+👉 **[https://as-35rx.vercel.app/](https://as-35rx.vercel.app/)**
+
+---
+
 This repository showcases our approach to enhancing object detection performance on an imbalanced dataset using a targeted copy-paste augmentation strategy. We identified underrepresented classes, augmented them intelligently, and evaluated performance across multiple YOLO variants to analyze the trade-offs between model size and accuracy.
 
 ---
