@@ -1,0 +1,20 @@
+# Ignore all Python scripts you listed
+test3
+train4
+val4
+train_3
+train_augmented.py
+train_augmented2.py
+dataset_debug.py
+check_classes_numbers
+
+# Ignore the entire runs folder
+runs/*
+
+# Allow the folder itself (so Git can access subpaths)
+!runs/
+
+# Allow only this specific subfolder
+!runs/detect/train14/
+!runs/detect/train13/
+!runs/detect/train15/

@@ -1,0 +1,18 @@
+# YOLOv8 Dataset Configuration File
+# ---------------------------------
+# NOTE: Using absolute paths is generally okay, but relative paths are more portable.
+# If you move your project, you may need to update these paths.
+
+# Train/val/test images (paths to directories containing images)
+train: C:\Users\Avneesh\Desktop\YOLO_FINETUNE\train_3\train3\images
+val: C:\Users\Avneesh\Desktop\YOLO_FINETUNE\train_3\val3\images
+test: C:\Users\Avneesh\Desktop\YOLO_FINETUNE\test3\images
+
+# --- Parameters ---
+
+# Number of classes in your dataset
+nc: 7
+
+# Class names in the correct order (from 0 to 6)
+names: ['OxygenTank', 'NitrogenTank', 'FirstAidBox', 'FireAlarm', 'SafetySwitchPanel', 'EmergencyPhone', 'FireExtinguisher']
+
